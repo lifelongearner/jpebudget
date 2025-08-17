@@ -5,338 +5,364 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JPE Budget</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@16.7.0/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@16.7.0/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js"></script>
 </head>
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
-        const useState = React.useState;
-        const useMemo = React.useMemo;
-        const PieChart = Recharts.PieChart;
-        const Pie = Recharts.Pie;
-        const Cell = Recharts.Cell;
-        const BarChart = Recharts.BarChart;
-        const Bar = Recharts.Bar;
-        const XAxis = Recharts.XAxis;
-        const YAxis = Recharts.YAxis;
-        const Tooltip = Recharts.Tooltip;
-        const Legend = Recharts.Legend;
-        const ResponsiveContainer = Recharts.ResponsiveContainer;
+    <script>
+        const runApp = () => {
+            const jsxCode = `
+                const useState = React.useState;
+                const useMemo = React.useMemo;
+                const PieChart = Recharts.PieChart;
+                const Pie = Recharts.Pie;
+                const Cell = Recharts.Cell;
+                const BarChart = Recharts.BarChart;
+                const Bar = Recharts.Bar;
+                const XAxis = Recharts.XAxis;
+                const YAxis = Recharts.YAxis;
+                const Tooltip = Recharts.Tooltip;
+                const Legend = Recharts.Legend;
+                const ResponsiveContainer = Recharts.ResponsiveContainer;
 
-        // --- Helper Functions ---
-        const formatCurrency = (value, decimals = 0) => {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: decimals,
-                maximumFractionDigits: decimals,
-            }).format(value);
-        };
+                // --- Helper Functions ---
+                const formatCurrency = (value, decimals = 0) => {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: decimals,
+                        maximumFractionDigits: decimals,
+                    }).format(value);
+                };
 
-        // --- Initial Data & Configuration ---
-        const initialAssets = {
-            brokerage1: 116000,
-            brokerage2: 550,
-            ira: 20000,
-            rothIra: 3500,
-            carSavings: 42000,
-            taxSavings: 19000,
-            furnitureSavings: 3500,
-            movingSavings: 5400,
-            businessChecking: 20000,
-            personalChecking: 1700 + 1966,
-            otherChecking: 1500,
-        };
+                // --- Initial Data & Configuration ---
+                const initialAssets = {
+                    brokerage1: 116000,
+                    brokerage2: 550,
+                    ira: 20000,
+                    rothIra: 3500,
+                    carSavings: 42000,
+                    taxSavings: 19000,
+                    furnitureSavings: 3500,
+                    movingSavings: 5400,
+                    businessChecking: 20000,
+                    personalChecking: 1700 + 1966,
+                    otherChecking: 1500,
+                };
 
-        const initialLiabilities = {
-            creditCards: 1500,
-            carLoan: 39200,
-        };
+                const initialLiabilities = {
+                    creditCards: 1500,
+                    carLoan: 39200,
+                };
 
-        const initialMonthlyExpenses = [
-            { name: "Rent", value: 2350, color: "#3b82f6" },
-            { name: "Car Payment", value: 1184, color: "#10b981" },
-            { name: "IRA Investment", value: 583, color: "#f59e0b" },
-            { name: "Groceries", value: 450, color: "#f97316" },
-            { name: "Gas (Driving)", value: 200, color: "#8b5cf6" },
-            { name: "Utilities", value: 130, color: "#eab308" },
-            { name: "Haircuts", value: 60, color: "#a855f7" },
-            { name: "Car Insurance", value: 50, color: "#ef4444" },
-            { name: "Clothing", value: 50, color: "#ec4899" },
-            { name: "Gym Membership", value: 27, color: "#84cc16" },
-            { name: "NA Contributions", value: 16, color: "#2dd4bf" },
-            { name: "Hygiene", value: 10, color: "#60a5fa" }
-        ];
+                const initialMonthlyExpenses = [
+                    { name: "Rent", value: 2350, color: "#3b82f6" },
+                    { name: "Car Payment", value: 1184, color: "#10b981" },
+                    { name: "IRA Investment", value: 583, color: "#f59e0b" },
+                    { name: "Groceries", value: 450, color: "#f97316" },
+                    { name: "Gas (Driving)", value: 200, color: "#8b5cf6" },
+                    { name: "Utilities", value: 130, color: "#eab308" },
+                    { name: "Haircuts", value: 60, color: "#a855f7" },
+                    { name: "Car Insurance", value: 50, color: "#ef4444" },
+                    { name: "Clothing", value: 50, color: "#ec4899" },
+                    { name: "Gym Membership", value: 27, color: "#84cc16" },
+                    { name: "NA Contributions", value: 16, color: "#2dd4bf" },
+                    { name: "Hygiene", value: 10, color: "#60a5fa" }
+                ];
 
-        // --- Financial Projection Logic ---
-        const runProjection = (currentNetWorth, monthlyContribution, annualReturn, goal) => {
-            let balance = currentNetWorth;
-            let months = 0;
-            const monthlyReturn = annualReturn / 12;
-            const projectionData = [];
+                // --- Financial Projection Logic ---
+                const runProjection = (currentNetWorth, monthlyContribution, annualReturn, goal) => {
+                    let balance = currentNetWorth;
+                    let months = 0;
+                    const monthlyReturn = annualReturn / 12;
+                    const projectionData = [];
 
-            while (balance < goal && months < 600) { // 50 year limit
-                balance = balance * (1 + monthlyReturn) + monthlyContribution;
-                months++;
-                if (months % 12 === 0) {
-                    projectionData.push({
-                        year: months / 12,
-                        netWorth: balance,
-                    });
-                }
-            }
-             if (projectionData.length === 0 || projectionData[projectionData.length - 1].netWorth < goal) {
-                projectionData.push({ year: months / 12, netWorth: balance });
-            }
-            return { months, projectionData };
-        };
+                    while (balance < goal && months < 600) { // 50 year limit
+                        balance = balance * (1 + monthlyReturn) + monthlyContribution;
+                        months++;
+                        if (months % 12 === 0) {
+                            projectionData.push({
+                                year: months / 12,
+                                netWorth: balance,
+                            });
+                        }
+                    }
+                     if (projectionData.length === 0 || projectionData[projectionData.length - 1].netWorth < goal) {
+                        projectionData.push({ year: months / 12, netWorth: balance });
+                    }
+                    return { months, projectionData };
+                };
 
 
-        // --- React Components ---
+                // --- React Components ---
 
-        const Nav = ({ activePage, setActivePage }) => {
-            const pages = ['Dashboard', 'Goal: $500k', 'Goal: $4M'];
-            return (
-                <nav className="w-full bg-gray-800 p-4 rounded-xl mb-8 shadow-lg">
-                    <ul className="flex justify-center items-center space-x-2 md:space-x-6">
-                        {pages.map(page => (
-                            <li key={page}>
-                                <button
-                                    onClick={() => setActivePage(page)}
-                                    className={`px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 ${
-                                        activePage === page
-                                            ? 'bg-blue-600 text-white shadow-md'
-                                            : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                                    }`}
-                                >
-                                    {page}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            );
-        };
+                const Nav = ({ activePage, setActivePage }) => {
+                    const pages = ['Dashboard', 'Goal: $500k', 'Goal: $4M'];
+                    return (
+                        <nav className="w-full bg-gray-800 p-4 rounded-xl mb-8 shadow-lg">
+                            <ul className="flex justify-center items-center space-x-2 md:space-x-6">
+                                {pages.map(page => (
+                                    <li key={page}>
+                                        <button
+                                            onClick={() => setActivePage(page)}
+                                            className={\`px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 \${
+                                                activePage === page
+                                                    ? 'bg-blue-600 text-white shadow-md'
+                                                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                                            }\`}
+                                        >
+                                            {page}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    );
+                };
 
-        const Dashboard = ({ assets, liabilities, netWorth, expenses, setExpenses }) => {
-            const totalExpenses = useMemo(() => expenses.reduce((sum, exp) => sum + exp.value, 0), [expenses]);
+                const Dashboard = ({ assets, liabilities, netWorth, expenses, setExpenses }) => {
+                    const totalExpenses = useMemo(() => expenses.reduce((sum, exp) => sum + exp.value, 0), [expenses]);
 
-            const handleExpenseChange = (index, newValue) => {
-                const updatedExpenses = [...expenses];
-                updatedExpenses[index].value = newValue;
-                setExpenses(updatedExpenses);
-            };
+                    const handleExpenseChange = (index, newValue) => {
+                        const updatedExpenses = [...expenses];
+                        updatedExpenses[index].value = newValue;
+                        setExpenses(updatedExpenses);
+                    };
 
-            const sortedExpenses = useMemo(() => [...expenses].sort((a, b) => b.value - a.value), [expenses]);
-            const maxMonthlyCost = sortedExpenses[0]?.value || 0;
+                    const sortedExpenses = useMemo(() => [...expenses].sort((a, b) => b.value - a.value), [expenses]);
+                    const maxMonthlyCost = sortedExpenses[0]?.value || 0;
 
-            return (
-                <div className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                        <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <h3 className="text-lg font-semibold text-green-400">Total Assets</h3>
-                            <p className="text-3xl font-bold text-white mt-2">{formatCurrency(assets)}</p>
-                        </div>
-                        <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <h3 className="text-lg font-semibold text-red-400">Total Liabilities</h3>
-                            <p className="text-3xl font-bold text-white mt-2">{formatCurrency(liabilities)}</p>
-                        </div>
-                        <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <h3 className="text-lg font-semibold text-blue-400">Current Net Worth</h3>
-                            <p className="text-3xl font-bold text-white mt-2">{formatCurrency(netWorth)}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <h2 className="text-2xl font-semibold mb-6 text-white">Monthly Budget Control</h2>
-                            {expenses.map((expense, index) => (
-                                <div key={index} className="mb-5">
-                                    <label className="flex justify-between items-center text-sm font-medium text-gray-300 mb-2">
-                                        <span>{expense.name}</span>
-                                        <span className="font-bold">{formatCurrency(expense.value)}</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max={Math.max(3000, expense.value * 2.5)}
-                                        value={expense.value}
-                                        step="1"
-                                        onChange={(e) => handleExpenseChange(index, parseInt(e.target.value))}
-                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                    />
+                    return (
+                        <div className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                                <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <h3 className="text-lg font-semibold text-green-400">Total Assets</h3>
+                                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(assets)}</p>
                                 </div>
-                            ))}
-                        </div>
-
-                        <div className="lg:col-span-2 space-y-8">
-                            <div className="bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[400px]">
-                                <h2 className="text-2xl font-semibold text-white">Monthly Expense Breakdown</h2>
-                                <ResponsiveContainer width="100%" height={350}>
-                                    <PieChart>
-                                        <Pie data={expenses} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} innerRadius={80} labelLine={false}>
-                                            {expenses.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                                        </Pie>
-                                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                                 <div className="text-center -mt-8">
-                                    <span className="text-3xl font-bold text-white">{formatCurrency(totalExpenses)}</span>
-                                    <span className="text-sm text-gray-400 block">Total Monthly Expenses</span>
+                                <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <h3 className="text-lg font-semibold text-red-400">Total Liabilities</h3>
+                                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(liabilities)}</p>
+                                </div>
+                                <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <h3 className="text-lg font-semibold text-blue-400">Current Net Worth</h3>
+                                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(netWorth)}</p>
                                 </div>
                             </div>
 
-                             <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                                <h2 className="text-2xl font-semibold mb-4 text-white">Monthly Cost Comparison</h2>
-                                {sortedExpenses.map((expense, index) => {
-                                    const barWidth = maxMonthlyCost > 0 ? (expense.value / maxMonthlyCost) * 100 : 0;
-                                    return (
-                                        <div key={index} className="w-full mb-4">
-                                            <div className="flex justify-between items-center mb-1 text-sm">
-                                                <span className="font-medium text-gray-300">{expense.name}</span>
-                                                <span className="font-semibold text-white">{formatCurrency(expense.value)}</span>
-                                            </div>
-                                            <div className="w-full bg-gray-700 rounded-full h-4">
-                                                <div className="h-4 rounded-full" style={{ width: `${barWidth}%`, backgroundColor: expense.color, transition: 'width 0.3s ease-out' }}></div>
-                                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div className="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <h2 className="text-2xl font-semibold mb-6 text-white">Monthly Budget Control</h2>
+                                    {expenses.map((expense, index) => (
+                                        <div key={index} className="mb-5">
+                                            <label className="flex justify-between items-center text-sm font-medium text-gray-300 mb-2">
+                                                <span>{expense.name}</span>
+                                                <span className="font-bold">{formatCurrency(expense.value)}</span>
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max={Math.max(3000, expense.value * 2.5)}
+                                                value={expense.value}
+                                                step="1"
+                                                onChange={(e) => handleExpenseChange(index, parseInt(e.target.value))}
+                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                            />
                                         </div>
-                                    );
-                                })}
+                                    ))}
+                                </div>
+
+                                <div className="lg:col-span-2 space-y-8">
+                                    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center min-h-[400px]">
+                                        <h2 className="text-2xl font-semibold text-white">Monthly Expense Breakdown</h2>
+                                        <ResponsiveContainer width="100%" height={350}>
+                                            <PieChart>
+                                                <Pie data={expenses} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} innerRadius={80} labelLine={false}>
+                                                    {expenses.map((entry, index) => <Cell key={\`cell-\${index}\`} fill={entry.color} />)}
+                                                </Pie>
+                                                <Tooltip formatter={(value) => formatCurrency(value)} />
+                                                <Legend />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                         <div className="text-center -mt-8">
+                                            <span className="text-3xl font-bold text-white">{formatCurrency(totalExpenses)}</span>
+                                            <span className="text-sm text-gray-400 block">Total Monthly Expenses</span>
+                                        </div>
+                                    </div>
+
+                                     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                        <h2 className="text-2xl font-semibold mb-4 text-white">Monthly Cost Comparison</h2>
+                                        {sortedExpenses.map((expense, index) => {
+                                            const barWidth = maxMonthlyCost > 0 ? (expense.value / maxMonthlyCost) * 100 : 0;
+                                            return (
+                                                <div key={index} className="w-full mb-4">
+                                                    <div className="flex justify-between items-center mb-1 text-sm">
+                                                        <span className="font-medium text-gray-300">{expense.name}</span>
+                                                        <span className="font-semibold text-white">{formatCurrency(expense.value)}</span>
+                                                    </div>
+                                                    <div className="w-full bg-gray-700 rounded-full h-4">
+                                                        <div className="h-4 rounded-full" style={{ width: \`\${barWidth}%\`, backgroundColor: expense.color, transition: 'width 0.3s ease-out' }}></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            );
-        };
+                    );
+                };
 
-        const GoalPage = ({ netWorth, monthlyExpenses, goalAmount }) => {
-            const [futureMonthlyIncome, setFutureMonthlyIncome] = useState(10000);
-            const [taxRate, setTaxRate] = useState(25);
-            const [annualReturn, setAnnualReturn] = useState(7);
+                const GoalPage = ({ netWorth, monthlyExpenses, goalAmount }) => {
+                    const [futureMonthlyIncome, setFutureMonthlyIncome] = useState(10000);
+                    const [taxRate, setTaxRate] = useState(25);
+                    const [annualReturn, setAnnualReturn] = useState(7);
 
-            const amountToSave = goalAmount - netWorth;
+                    const amountToSave = goalAmount - netWorth;
 
-            const netMonthlyIncome = futureMonthlyIncome * (1 - taxRate / 100);
-            const currentMonthlySavings = (7000 + 10000 / 9) - monthlyExpenses;
-            const futureMonthlySavings = netMonthlyIncome - monthlyExpenses;
+                    const netMonthlyIncome = futureMonthlyIncome * (1 - taxRate / 100);
+                    const currentMonthlySavings = (7000 + 10000 / 9) - monthlyExpenses;
+                    const futureMonthlySavings = netMonthlyIncome - monthlyExpenses;
 
-            // A blended savings rate for a more realistic projection
-            const avgMonthlySavings = (currentMonthlySavings * 7 + futureMonthlySavings * 29) / 36;
+                    // A blended savings rate for a more realistic projection
+                    const avgMonthlySavings = (currentMonthlySavings * 7 + futureMonthlySavings * 29) / 36;
 
-            // Scenarios
-            const bestEstimate = runProjection(netWorth, avgMonthlySavings, annualReturn / 100, goalAmount);
-            const aggressive = runProjection(netWorth, avgMonthlySavings * 1.5, (annualReturn + 3) / 100, goalAmount); // Higher savings & return
-            const conservative = runProjection(netWorth, avgMonthlySavings * 0.75, (annualReturn - 2) / 100, goalAmount); // Lower savings & return
+                    // Scenarios
+                    const bestEstimate = runProjection(netWorth, avgMonthlySavings, annualReturn / 100, goalAmount);
+                    const aggressive = runProjection(netWorth, avgMonthlySavings * 1.5, (annualReturn + 3) / 100, goalAmount); // Higher savings & return
+                    const conservative = runProjection(netWorth, avgMonthlySavings * 0.75, (annualReturn - 2) / 100, goalAmount); // Lower savings & return
 
-            const scenarios = [
-                { name: 'Aggressive', months: aggressive.months, data: aggressive.projectionData },
-                { name: 'Best Estimate', months: bestEstimate.months, data: bestEstimate.projectionData },
-                { name: 'Conservative', months: conservative.months, data: conservative.projectionData },
-            ];
+                    const scenarios = [
+                        { name: 'Aggressive', months: aggressive.months, data: aggressive.projectionData },
+                        { name: 'Best Estimate', months: bestEstimate.months, data: bestEstimate.projectionData },
+                        { name: 'Conservative', months: conservative.months, data: conservative.projectionData },
+                    ];
 
-            const renderTimeline = (months) => {
-                if (months >= 600) return "50+ years";
-                const years = Math.floor(months / 12);
-                const remainingMonths = months % 12;
-                return `${years} years, ${remainingMonths} months`;
-            };
+                    const renderTimeline = (months) => {
+                        if (months >= 600) return "50+ years";
+                        const years = Math.floor(months / 12);
+                        const remainingMonths = months % 12;
+                        return \`\${years} years, \${remainingMonths} months\`;
+                    };
 
-            return (
-                <div className="space-y-8">
-                    <div className="text-center bg-gray-800 p-6 rounded-2xl shadow-lg">
-                        <h2 className="text-3xl font-bold text-white">Path to {formatCurrency(goalAmount)}</h2>
-                        <p className="text-lg text-gray-400 mt-2">
-                            Current Net Worth: <span className="font-bold text-blue-400">{formatCurrency(netWorth)}</span> |
-                            Amount Remaining: <span className="font-bold text-green-400">{formatCurrency(amountToSave)}</span>
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Future Monthly Income (Post-Tax-Free Period)</label>
-                            <input type="number" value={futureMonthlyIncome} onChange={e => setFutureMonthlyIncome(Number(e.target.value))} className="w-full bg-gray-700 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                        </div>
-                        <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Assumed Annual Investment Return ({annualReturn}%)</label>
-                            <input type="range" min="2" max="15" value={annualReturn} onChange={e => setAnnualReturn(Number(e.target.value))} className="w-full"/>
-                        </div>
-                         <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Assumed Tax Rate ({taxRate}%)</label>
-                            <input type="range" min="15" max="40" value={taxRate} onChange={e => setTaxRate(Number(e.target.value))} className="w-full"/>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                        {scenarios.map(scenario => (
-                            <div key={scenario.name} className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                                <h3 className="text-xl font-semibold text-blue-400">{scenario.name}</h3>
-                                <p className="text-4xl font-bold text-white my-3">{renderTimeline(scenario.months)}</p>
-                                <p className="text-gray-400">Estimated Completion</p>
+                    return (
+                        <div className="space-y-8">
+                            <div className="text-center bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                <h2 className="text-3xl font-bold text-white">Path to {formatCurrency(goalAmount)}</h2>
+                                <p className="text-lg text-gray-400 mt-2">
+                                    Current Net Worth: <span className="font-bold text-blue-400">{formatCurrency(netWorth)}</span> |
+                                    Amount Remaining: <span className="font-bold text-green-400">{formatCurrency(amountToSave)}</span>
+                                </p>
                             </div>
-                        ))}
-                    </div>
 
-                    <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
-                         <h2 className="text-2xl font-semibold mb-4 text-white">Net Worth Growth Projection (Best Estimate)</h2>
-                         <ResponsiveContainer width="100%" height={400}>
-                            <BarChart data={bestEstimate.projectionData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <XAxis dataKey="year" tickFormatter={(year) => `Year ${year}`} />
-                                <YAxis tickFormatter={(value) => formatCurrency(value, 0)} />
-                                <Tooltip formatter={(value) => formatCurrency(value, 0)}/>
-                                <Legend />
-                                <Bar dataKey="netWorth" fill="#3b82f6" name="Projected Net Worth" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            );
-        };
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">Future Monthly Income (Post-Tax-Free Period)</label>
+                                    <input type="number" value={futureMonthlyIncome} onChange={e => setFutureMonthlyIncome(Number(e.target.value))} className="w-full bg-gray-700 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                                </div>
+                                <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">Assumed Annual Investment Return ({annualReturn}%)</label>
+                                    <input type="range" min="2" max="15" value={annualReturn} onChange={e => setAnnualReturn(Number(e.target.value))} className="w-full"/>
+                                </div>
+                                 <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">Assumed Tax Rate ({taxRate}%)</label>
+                                    <input type="range" min="15" max="40" value={taxRate} onChange={e => setTaxRate(Number(e.target.value))} className="w-full"/>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                                {scenarios.map(scenario => (
+                                    <div key={scenario.name} className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                        <h3 className="text-xl font-semibold text-blue-400">{scenario.name}</h3>
+                                        <p className="text-4xl font-bold text-white my-3">{renderTimeline(scenario.months)}</p>
+                                        <p className="text-gray-400">Estimated Completion</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">
+                                 <h2 className="text-2xl font-semibold mb-4 text-white">Net Worth Growth Projection (Best Estimate)</h2>
+                                 <ResponsiveContainer width="100%" height={400}>
+                                    <BarChart data={bestEstimate.projectionData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                        <XAxis dataKey="year" tickFormatter={(year) => \`Year \${year}\`} />
+                                        <YAxis tickFormatter={(value) => formatCurrency(value, 0)} />
+                                        <Tooltip formatter={(value) => formatCurrency(value, 0)}/>
+                                        <Legend />
+                                        <Bar dataKey="netWorth" fill="#3b82f6" name="Projected Net Worth" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    );
+                };
 
 
-        function App() {
-            const [activePage, setActivePage] = useState('Dashboard');
-            const [expenses, setExpenses] = useState(initialMonthlyExpenses);
+                function App() {
+                    const [activePage, setActivePage] = useState('Dashboard');
+                    const [expenses, setExpenses] = useState(initialMonthlyExpenses);
 
-            const totalAssets = useMemo(() => Object.values(initialAssets).reduce((sum, val) => sum + val, 0), []);
-            const totalLiabilities = useMemo(() => Object.values(initialLiabilities).reduce((sum, val) => sum + val, 0), []);
-            const netWorth = useMemo(() => totalAssets - totalLiabilities, [totalAssets, totalLiabilities]);
-            const totalMonthlyExpenses = useMemo(() => expenses.reduce((sum, item) => sum + item.value, 0), [expenses]);
+                    const totalAssets = useMemo(() => Object.values(initialAssets).reduce((sum, val) => sum + val, 0), []);
+                    const totalLiabilities = useMemo(() => Object.values(initialLiabilities).reduce((sum, val) => sum + val, 0), []);
+                    const netWorth = useMemo(() => totalAssets - totalLiabilities, [totalAssets, totalLiabilities]);
+                    const totalMonthlyExpenses = useMemo(() => expenses.reduce((sum, item) => sum + item.value, 0), [expenses]);
 
-            const renderPage = () => {
-                switch (activePage) {
-                    case 'Dashboard':
-                        return <Dashboard assets={totalAssets} liabilities={totalLiabilities} netWorth={netWorth} expenses={expenses} setExpenses={setExpenses} />;
-                    case 'Goal: $500k':
-                        return <GoalPage netWorth={netWorth} monthlyExpenses={totalMonthlyExpenses} goalAmount={500000} />;
-                    case 'Goal: $4M':
-                         return <GoalPage netWorth={netWorth} monthlyExpenses={totalMonthlyExpenses} goalAmount={4000000} />;
-                    default:
-                        return <Dashboard assets={totalAssets} liabilities={totalLiabilities} netWorth={netWorth} expenses={expenses} setExpenses={setExpenses} />;
+                    const renderPage = () => {
+                        switch (activePage) {
+                            case 'Dashboard':
+                                return <Dashboard assets={totalAssets} liabilities={totalLiabilities} netWorth={netWorth} expenses={expenses} setExpenses={setExpenses} />;
+                            case 'Goal: $500k':
+                                return <GoalPage netWorth={netWorth} monthlyExpenses={totalMonthlyExpenses} goalAmount={500000} />;
+                            case 'Goal: $4M':
+                                 return <GoalPage netWorth={netWorth} monthlyExpenses={totalMonthlyExpenses} goalAmount={4000000} />;
+                            default:
+                                return <Dashboard assets={totalAssets} liabilities={totalLiabilities} netWorth={netWorth} expenses={expenses} setExpenses={setExpenses} />;
+                        }
+                    };
+
+                    return (
+                        <div className="bg-gray-900 text-gray-200 min-h-screen p-4 md:p-8 font-sans">
+                            <div className="max-w-7xl mx-auto">
+                                <header className="text-center mb-8">
+                                    <h1 className="text-3xl md:text-5xl font-bold text-white">Your Financial Future</h1>
+                                    <p className="text-lg text-gray-400 mt-2">An Interactive Dashboard for Your Net Worth Goals</p>
+                                </header>
+                                <Nav activePage={activePage} setActivePage={setActivePage} />
+                                <main>
+                                    {renderPage()}
+                                </main>
+                            </div>
+                        </div>
+                    );
                 }
-            };
 
-            return (
-                <div className="bg-gray-900 text-gray-200 min-h-screen p-4 md:p-8 font-sans">
-                    <div className="max-w-7xl mx-auto">
-                        <header className="text-center mb-8">
-                            <h1 className="text-3xl md:text-5xl font-bold text-white">Your Financial Future</h1>
-                            <p className="text-lg text-gray-400 mt-2">An Interactive Dashboard for Your Net Worth Goals</p>
-                        </header>
-                        <Nav activePage={activePage} setActivePage={setActivePage} />
-                        <main>
-                            {renderPage()}
-                        </main>
-                    </div>
-                </div>
-            );
-        }
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(<App />);
+            `;
 
-        ReactDOM.render(<App />, document.getElementById('root'));
+            try {
+                const transformedCode = Babel.transform(jsxCode, { presets: ['react'] }).code;
+                eval(transformedCode);
+            } catch (error) {
+                console.error("Babel/Execution Error:", error);
+                const root = document.getElementById('root');
+                root.innerHTML = '<pre style="color: red; font-family: monospace;">' + error.stack + '</pre>';
+            }
+        };
+
+        const checkAndRun = () => {
+            if (window.React && window.ReactDOM && window.Babel && window.Recharts) {
+                console.log("All libraries loaded. Running app.");
+                clearInterval(intervalId);
+                runApp();
+            } else {
+                console.log("Waiting for libraries to load...");
+            }
+        };
+
+        const intervalId = setInterval(checkAndRun, 100);
     </script>
 </body>
 </html>

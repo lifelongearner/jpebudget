@@ -10,12 +10,12 @@ def run_verification():
         page.on("console", lambda msg: print(f"CONSOLE: {msg.type}: {msg.text}"))
 
         try:
-            # Go to the local http server
-            page.goto('http://localhost:8000/index.html', wait_until='networkidle')
+            # Go to the local http server on port 8001
+            page.goto('http://localhost:8001/index.html', wait_until='networkidle')
 
             # Wait for the main heading to be visible to ensure the app has rendered
             heading = page.get_by_role("heading", name="Your Financial Future")
-            expect(heading).to_be_visible(timeout=15000) # Increased timeout
+            expect(heading).to_be_visible(timeout=15000)
 
             # Also check if the dashboard content is there
             net_worth_label = page.get_by_text("Current Net Worth")
